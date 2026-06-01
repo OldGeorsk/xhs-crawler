@@ -171,6 +171,7 @@ class Synchronizer:
                 try:
                     db.upsert_creator(cid, name, creator["profile_url"])
 
+                    notes_to_process = 0
                     for i, note in enumerate(notes):
                         note_id = note["note_id"]
 
@@ -179,8 +180,15 @@ class Synchronizer:
                             print(f"  [skip] {note_id} ({note['title']}) - already in database.")
                             continue
 
+                        # -- human-like idle (15-25s) between notes ------------
+                        if notes_to_process > 0:
+                            idle_sec = random.randint(15, 25)
+                            print(f"  [zzz] {idle_sec}s idle ...")
+                            time.sleep(idle_sec)
+
                         # -- detail page enrichment -----------------------------
                         print(f"\n  [{i+1}/{len(notes)}] {note['title']} ({note_id})")
+                        notes_to_process += 1
 
                         enriched = collector.collect_note_detail(page, note)
                         if enriched is None:
