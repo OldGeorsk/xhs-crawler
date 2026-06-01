@@ -1,0 +1,5 @@
+# Browser automation
+playwright>=1.40.0
+
+# All other dependencies are Python standard library:
+#   sqlite3, json, re, argparse, pathlib, urllib, subprocess

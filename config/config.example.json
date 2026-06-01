@@ -1,0 +1,33 @@
+{
+  "creators": [
+    {
+      "id": "creator_001",
+      "name": "example_creator",
+      "profile_url": "https://www.xiaohongshu.com/user/profile/xxxxxxxxxx",
+      "enabled": true
+    }
+  ],
+
+  "sync": {
+    "max_notes_per_run": 50,
+    "scroll_delay_ms": 2000,
+    "page_load_timeout_ms": 30000,
+    "request_interval_ms": 3000
+  },
+
+  "paths": {
+    "downloads": "downloads",
+    "database": "data/xhs_archive.db"
+  },
+
+  "browser": {
+    "headless": false,
+    "viewport": { "width": 1280, "height": 800 },
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  },
+
+  "logging": {
+    "level": "INFO",
+    "file": "logs/xhs_crawler.log"
+  }
+}

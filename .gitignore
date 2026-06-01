@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+.venv/
+venv/
+
+# Configuration with real credentials — keep private
+config/config.json
+config/cookies.json
+config/storage_state.json
+
+# Downloaded content — too large for git
+downloads/
+
+# Database files
+data/
+*.db
+*.sqlite
+
+# Logs
+logs/
+*.log
+
+# IDE / tools
+.vscode/
+.idea/
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Playwright
+playwright-report/
+
+# CDP Chrome profile (local only)
+chrome_profile/
+
+# Debug output
+debug_output/

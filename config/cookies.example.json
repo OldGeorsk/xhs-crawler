@@ -1,0 +1,22 @@
+[
+  {
+    "name": "web_session",
+    "value": "your_web_session_cookie_here",
+    "domain": ".xiaohongshu.com",
+    "path": "/",
+    "expires": 1735689600,
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "a1",
+    "value": "your_a1_cookie_here",
+    "domain": ".xiaohongshu.com",
+    "path": "/",
+    "expires": 1735689600,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  }
+]
