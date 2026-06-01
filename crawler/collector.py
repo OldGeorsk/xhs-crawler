@@ -156,7 +156,8 @@ class NoteCollector:
     # Phase 2: detail-level extraction (shared page)
     # ------------------------------------------------------------------
 
-    def collect_note_detail(self, page: Page, note: dict) -> Optional[dict]:
+    def collect_note_detail(self, page: Page, note: dict,
+                            should_like: bool = False) -> Optional[dict]:
         """
         Navigate from the current page to *note*'s detail page using the
         ``detail_url`` (with xsec_token) extracted from the profile card.
@@ -211,12 +212,41 @@ class NoteCollector:
         else:
             print(f"  [detail] {note_id}: failed to extract data from __INITIAL_STATE__")
 
+        # -- random like (1 in 3~5 notes, human-like engagement) -------
+        if should_like:
+            _human_delay(600, 300)
+            self._click_like(page)
+            note.setdefault("liked", True)
+
         # -- navigate back to profile for the next note -----------------
         _human_delay(800, 400)
         page.goto(self._profile_url, timeout=30000, wait_until="domcontentloaded")
         _human_delay(2000, 800)
 
         return note
+
+    # ------------------------------------------------------------------
+    # Internal: like button
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _click_like(page: Page) -> None:
+        """
+        Click the like button on a note detail page, if it is not already
+        liked (no ``like-active`` class).
+        """
+        try:
+            like_btn = page.query_selector("span.like-wrapper")
+            if like_btn:
+                classes = like_btn.get_attribute("class") or ""
+                if "like-active" not in classes:
+                    like_btn.click()
+                    print("  [like] Liked this note.")
+                else:
+                    print("  [like] Already liked — skipped.")
+        except Exception as e:
+            # Never fail a sync because of a like
+            print(f"  [like] Could not click like: {e}")
 
     # ------------------------------------------------------------------
     # Internal: scroll & extract (profile page)

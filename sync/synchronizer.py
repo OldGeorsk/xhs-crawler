@@ -172,6 +172,7 @@ class Synchronizer:
                     db.upsert_creator(cid, name, creator["profile_url"])
 
                     notes_to_process = 0
+                    next_like_at = random.randint(2, 5)
                     for i, note in enumerate(notes):
                         note_id = note["note_id"]
 
@@ -186,11 +187,18 @@ class Synchronizer:
                             print(f"  [zzz] {idle_sec}s idle ...")
                             time.sleep(idle_sec)
 
+                        # -- random like trigger (every 2-5 notes) ----------
+                        should_like = notes_to_process > 0 and notes_to_process >= next_like_at
+
                         # -- detail page enrichment -----------------------------
                         print(f"\n  [{i+1}/{len(notes)}] {note['title']} ({note_id})")
                         notes_to_process += 1
 
-                        enriched = collector.collect_note_detail(page, note)
+                        enriched = collector.collect_note_detail(
+                            page, note, should_like=should_like)
+
+                        if should_like:
+                            next_like_at = notes_to_process + random.randint(2, 5)
                         if enriched is None:
                             stats["errors"] += 1
                             continue
