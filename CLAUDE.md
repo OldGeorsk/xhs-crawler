@@ -1,5 +1,55 @@
 # CLAUDE.md
 
+## Quick Reference — Daily Operations
+
+All commands are run from the project root.  CDP mode (real Chrome) is the default.
+
+### Sync (download new notes from a creator)
+
+```bash
+python main.py                          # Sync the first enabled creator
+python main.py --creator <id>           # Sync a specific creator
+python main.py --dry-run                # Preview only — no download, no DB writes
+python main.py --dry-run --creator <id>
+```
+
+Before syncing, Chrome must be running with the debug port open:
+
+```bash
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222 --user-data-dir=./chrome_profile
+```
+
+The crawler will open xiaohongshu.com in that Chrome window; log in once, then leave it open.  Subsequent syncs reuse the same session.
+
+If CDP is not available the script falls back to `storage_state` + QR-code login automatically.
+
+### Creator management
+
+```bash
+python main.py --add                    # Interactive — prompts for name + profile URL
+python main.py --remove <id>            # Removes from config only; archive + DB are kept
+python main.py --list                   # List all tracked creators
+python main.py --status                 # DB overview: note counts, last sync, date range
+```
+
+### Search & analysis (read-only — no network, no writes)
+
+```bash
+python main.py --search "制服"          # Full-text search across all archived notes
+python main.py --search "jk" --creator 4  # Filter by creator
+python main.py --report 1               # Statistical report: tags, trends, top posts
+```
+
+### Emergency / fallback
+
+```bash
+python login_helper.py                  # Manual QR-code login (saves storage_state.json)
+python login_helper.py --check          # Test whether current session is still valid
+python main.py --no-cdp                 # Force storage_state mode (skip CDP)
+```
+
+---
+
 ## Project Overview
 
 This project is a personal-use Xiaohongshu (RED/XHS) content synchronization tool.
