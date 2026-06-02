@@ -9,7 +9,8 @@
   ],
 
   "sync": {
-    "max_notes_per_run": 50,
+    "mode": "fast",
+    "max_notes_per_run": 15,
     "scroll_delay_ms": 2000,
     "page_load_timeout_ms": 30000,
     "request_interval_ms": 3000

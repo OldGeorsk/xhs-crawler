@@ -142,8 +142,10 @@ def _sanitise_folder_name(name: str, max_len: int = 60) -> str:
 
     Keeps: Chinese chars, letters, digits, spaces, and a few safe symbols.
     """
+    # Strip emoji and other non-BMP characters (U+10000+) that break GBK on Windows
+    safe = re.sub(r'[\U00010000-\U0010FFFF]', '', name)
     # Replace path-unsafe characters with underscore
-    safe = re.sub(r'[<>:"/\\|?*]', "_", name)
+    safe = re.sub(r'[<>:"/\\|?*]', "_", safe)
     # Collapse whitespace
     safe = re.sub(r"\s+", " ", safe).strip()
     # Trim to max_len, trying not to cut mid-character

@@ -15,8 +15,18 @@ Commands:
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
+
+# Force UTF-8 on Windows to avoid GBK encoding errors with emoji in file paths
+if sys.platform == "win32":
+    os.environ.setdefault("PYTHONUTF8", "1")
+    os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+    # Reconfigure stdout/stderr to UTF-8 (env vars only work at startup)
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))

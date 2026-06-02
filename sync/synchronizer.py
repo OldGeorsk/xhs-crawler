@@ -168,11 +168,17 @@ class Synchronizer:
                 db = self._get_db()
                 db.connect()
 
+                # Read sync mode from config: "fast" or "safe" (default)
+                mode = self.config.get("sync", {}).get("mode", "safe")
+                print(f"  Mode: {mode}")
+
                 try:
                     db.upsert_creator(cid, name, creator["profile_url"])
 
                     notes_to_process = 0
                     next_like_at = random.randint(2, 5)
+                    next_collect_at = random.randint(5, 8)
+
                     for i, note in enumerate(notes):
                         note_id = note["note_id"]
 
@@ -181,24 +187,42 @@ class Synchronizer:
                             print(f"  [skip] {note_id} ({note['title']}) - already in database.")
                             continue
 
-                        # -- human-like idle (15-25s) between notes ------------
+                        # -- inter-note delay (mode-dependent) ----------------
                         if notes_to_process > 0:
-                            idle_sec = random.randint(15, 25)
-                            print(f"  [zzz] {idle_sec}s idle ...")
-                            time.sleep(idle_sec)
+                            if mode == "fast":
+                                # Fast mode: 1-3s between notes
+                                idle_sec = random.randint(1, 3)
+                                print(f"  [..] {idle_sec}s pause")
+                                time.sleep(idle_sec)
+                                # Every ~10 notes, take a longer break
+                                if notes_to_process % 10 == 0:
+                                    long_idle = random.randint(15, 25)
+                                    print(f"  [zzz] {long_idle}s long idle ...")
+                                    time.sleep(long_idle)
+                            else:
+                                # Safe mode: 15-25s between every note
+                                idle_sec = random.randint(15, 25)
+                                print(f"  [zzz] {idle_sec}s idle ...")
+                                time.sleep(idle_sec)
 
-                        # -- random like trigger (every 2-5 notes) ----------
+                        # -- random engagement triggers -------------------------
                         should_like = notes_to_process > 0 and notes_to_process >= next_like_at
+                        should_collect = notes_to_process > 0 and notes_to_process >= next_collect_at
 
                         # -- detail page enrichment -----------------------------
                         print(f"\n  [{i+1}/{len(notes)}] {note['title']} ({note_id})")
                         notes_to_process += 1
 
                         enriched = collector.collect_note_detail(
-                            page, note, should_like=should_like)
+                            page, note,
+                            should_like=should_like,
+                            should_collect=should_collect,
+                        )
 
                         if should_like:
                             next_like_at = notes_to_process + random.randint(2, 5)
+                        if should_collect:
+                            next_collect_at = notes_to_process + random.randint(5, 8)
                         if enriched is None:
                             stats["errors"] += 1
                             continue

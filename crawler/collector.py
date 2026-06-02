@@ -157,7 +157,8 @@ class NoteCollector:
     # ------------------------------------------------------------------
 
     def collect_note_detail(self, page: Page, note: dict,
-                            should_like: bool = False) -> Optional[dict]:
+                            should_like: bool = False,
+                            should_collect: bool = False) -> Optional[dict]:
         """
         Navigate from the current page to *note*'s detail page using the
         ``detail_url`` (with xsec_token) extracted from the profile card.
@@ -212,11 +213,15 @@ class NoteCollector:
         else:
             print(f"  [detail] {note_id}: failed to extract data from __INITIAL_STATE__")
 
-        # -- random like (1 in 3~5 notes, human-like engagement) -------
+        # -- random like / collect (human-like engagement) ---------------
         if should_like:
             _human_delay(600, 300)
             self._click_like(page)
             note.setdefault("liked", True)
+        elif should_collect:
+            _human_delay(600, 300)
+            self._click_collect(page)
+            note.setdefault("collected", True)
 
         # -- navigate back to profile for the next note -----------------
         _human_delay(800, 400)
@@ -247,6 +252,24 @@ class NoteCollector:
         except Exception as e:
             # Never fail a sync because of a like
             print(f"  [like] Could not click like: {e}")
+
+    @staticmethod
+    def _click_collect(page: Page) -> None:
+        """
+        Click the collect (bookmark) button on a note detail page,
+        if it is not already collected (no ``collect-active`` class).
+        """
+        try:
+            collect_btn = page.query_selector("span.collect-wrapper")
+            if collect_btn:
+                classes = collect_btn.get_attribute("class") or ""
+                if "collect-active" not in classes:
+                    collect_btn.click()
+                    print("  [collect] Collected this note.")
+                else:
+                    print("  [collect] Already collected — skipped.")
+        except Exception as e:
+            print(f"  [collect] Could not click collect: {e}")
 
     # ------------------------------------------------------------------
     # Internal: scroll & extract (profile page)
