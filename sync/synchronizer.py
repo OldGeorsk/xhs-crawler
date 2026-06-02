@@ -178,6 +178,7 @@ class Synchronizer:
                     notes_to_process = 0
                     next_like_at = random.randint(2, 5)
                     next_collect_at = random.randint(5, 8)
+                    print(f"  [init] Like at #{next_like_at}, Collect at #{next_collect_at}")
 
                     for i, note in enumerate(notes):
                         note_id = note["note_id"]
@@ -185,6 +186,15 @@ class Synchronizer:
                         # -- incremental sync: skip if already archived ------------
                         if db.note_exists(note_id):
                             print(f"  [skip] {note_id} ({note['title']}) - already in database.")
+                            continue
+
+                        # -- fast mode: random skip (30% chance) -----------------
+                        if mode == "fast" and random.random() < 0.3:
+                            print(f"  [browse] Skipped: {note.get('title', '?')} ({note_id})")
+                            notes_to_process += 1
+                            # Still increment like/collect counters
+                            if notes_to_process >= next_like_at:
+                                print(f"  [like] Would like #{notes_to_process} but detail skipped.")
                             continue
 
                         # -- inter-note delay (mode-dependent) ----------------
@@ -206,8 +216,8 @@ class Synchronizer:
                                 time.sleep(idle_sec)
 
                         # -- random engagement triggers -------------------------
-                        should_like = notes_to_process > 0 and notes_to_process >= next_like_at
-                        should_collect = notes_to_process > 0 and notes_to_process >= next_collect_at
+                        should_like = notes_to_process >= next_like_at
+                        should_collect = notes_to_process >= next_collect_at
 
                         # -- detail page enrichment -----------------------------
                         print(f"\n  [{i+1}/{len(notes)}] {note['title']} ({note_id})")
@@ -221,8 +231,10 @@ class Synchronizer:
 
                         if should_like:
                             next_like_at = notes_to_process + random.randint(2, 5)
+                            print(f"  [info] Next like at note #{next_like_at}")
                         if should_collect:
                             next_collect_at = notes_to_process + random.randint(5, 8)
+                            print(f"  [info] Next collect at note #{next_collect_at}")
                         if enriched is None:
                             stats["errors"] += 1
                             continue

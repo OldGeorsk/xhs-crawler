@@ -218,7 +218,8 @@ class NoteCollector:
             _human_delay(600, 300)
             self._click_like(page)
             note.setdefault("liked", True)
-        elif should_collect:
+
+        if should_collect:
             _human_delay(600, 300)
             self._click_collect(page)
             note.setdefault("collected", True)
